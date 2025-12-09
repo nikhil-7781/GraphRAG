@@ -1,0 +1,59 @@
+# PDF Processing
+PyMuPDF
+pdfplumber
+pytesseract
+Pillow
+camelot-py[cv]
+tabula-py
+
+# NLP & Embeddings
+sentence-transformers
+transformers
+torch>=2.2.0
+keybert
+yake
+
+# Knowledge Graph Generation
+kg-gen
+litellm
+
+# Multi-Agent System with LangGraph
+langgraph
+langchain
+langchain-core
+langchain-community
+
+# Vector Store & Search
+faiss-cpu
+
+# Graph Database & Processing
+neo4j
+networkx
+
+# Backend & API
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pydantic-settings
+
+# Database
+sqlalchemy
+psycopg2-binary
+pymongo
+
+# Utilities
+python-dotenv
+loguru
+tenacity
+httpx
+aiofiles
+
+# Monitoring & DevOps
+prometheus-client
+python-json-logger
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov

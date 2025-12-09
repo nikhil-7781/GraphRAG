@@ -1,0 +1,68 @@
+# GraphLLM Docker Compose Configuration
+# Simple standalone deployment with persistent storage
+
+version: '3.8'
+
+services:
+  # Main GraphLLM Application
+  graphllm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: graphllm
+    image: graphllm:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persistent storage for data, uploads, and logs
+      - graphllm-data:/app/data
+      - graphllm-uploads:/app/uploads
+      - graphllm-logs:/app/logs
+      - graphllm-cache:/app/cache
+    environment:
+      # Gemini API Configuration
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-1.5-flash}
+
+      # Application Settings
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DEBUG=false
+
+      # LLM Settings
+      - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.7}
+      - LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-2048}
+
+      # Embedding Settings
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-all-MiniLM-L6-v2}
+      - EMBEDDING_BATCH_SIZE=${EMBEDDING_BATCH_SIZE:-128}
+
+      # API Settings
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-50}
+
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - graphllm-network
+
+volumes:
+  # Named volumes for persistent storage
+  graphllm-data:
+    driver: local
+  graphllm-uploads:
+    driver: local
+  graphllm-logs:
+    driver: local
+  graphllm-cache:
+    driver: local
+
+networks:
+  graphllm-network:
+    driver: bridge

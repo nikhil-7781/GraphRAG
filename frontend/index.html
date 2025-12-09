@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphLLM - PDF Knowledge Graph & RAG</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="app-title">GraphLLM</h1>
+            <p class="app-subtitle">PDF Knowledge Graph & RAG System</p>
+        </div>
+
+        <div class="header-controls">
+            <div class="upload-section">
+                <input type="file" id="pdf-upload" accept=".pdf" hidden>
+                <button id="upload-btn" class="btn btn-primary" onclick="document.getElementById('pdf-upload').click()">
+                    Upload PDF
+                </button>
+                <span id="upload-status" class="status-text"></span>
+            </div>
+
+            <button id="reindex-btn" class="btn btn-secondary">Reindex</button>
+            <button id="clear-btn" class="btn btn-danger">Clear All</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-container">
+        <!-- Left Pane: Graph Visualization -->
+        <aside id="graph-pane" class="graph-pane" role="region" aria-label="Knowledge Graph Visualization">
+            <div class="pane-header">
+                <h2>Knowledge Graph</h2>
+                <div class="graph-controls">
+                    <button id="zoom-in-btn" class="icon-btn" aria-label="Zoom In">+</button>
+                    <button id="zoom-out-btn" class="icon-btn" aria-label="Zoom Out">-</button>
+                    <button id="reset-view-btn" class="icon-btn" aria-label="Reset View">⟲</button>
+                </div>
+            </div>
+
+            <div id="graph-container" class="graph-container" role="img" aria-label="Interactive knowledge graph">
+                <!-- Graph visualization will be rendered here via JavaScript -->
+                <div class="graph-placeholder">
+                    <p>Upload a PDF to generate a knowledge graph</p>
+                    <p class="help-text">Graph visualization requires JavaScript for interactivity</p>
+                </div>
+            </div>
+
+            <div class="graph-legend">
+                <h3>Legend</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <span class="legend-color concept"></span>
+                        <span>Concept</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color function"></span>
+                        <span>Function/Method</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color class"></span>
+                        <span>Class/Type</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color term"></span>
+                        <span>Term/Definition</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Pane: Node Details & Chat -->
+        <section id="detail-pane" class="detail-pane">
+            <!-- Node Detail Section -->
+            <div id="node-detail" class="node-detail card">
+                <div class="card-header">
+                    <h2>Node Details</h2>
+                    <button id="close-node-detail" class="icon-btn" aria-label="Close">✕</button>
+                </div>
+
+                <div id="node-content" class="node-content">
+                    <p class="placeholder-text">Click a node in the graph to view details</p>
+                </div>
+
+                <!-- Node detail will be populated dynamically:
+                <div class="node-info">
+                    <h3 class="node-label">[Node Label]</h3>
+                    <span class="node-type badge">[Type]</span>
+                    <span class="node-importance">Importance: [Score]</span>
+
+                    <div class="node-summary">
+                        <h4>Summary</h4>
+                        <p>[AI-generated summary with (p. N) citations]</p>
+                    </div>
+
+                    <div class="node-sources">
+                        <h4>Sources</h4>
+                        <button class="expand-toggle">Show Sources</button>
+                        <ul class="sources-list" hidden>
+                            <li>p.12 - "Exact snippet..." (chunk_id)</li>
+                        </ul>
+                    </div>
+
+                    <div class="related-nodes">
+                        <h4>Related Nodes</h4>
+                        <ul class="related-list">
+                            <li>[Node] - [relation] - [confidence]</li>
+                        </ul>
+                    </div>
+                </div>
+                -->
+            </div>
+
+            <!-- Chat Section -->
+            <div id="chat" class="chat-section card">
+                <div class="card-header">
+                    <h2>Chat with Document</h2>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="include-citations" checked>
+                        <span>Include Citations</span>
+                    </label>
+                </div>
+
+                <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+                    <div class="message system">
+                        <p>Ask questions about your uploaded PDF. Answers will cite page numbers.</p>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <textarea
+                        id="chat-input"
+                        class="chat-input"
+                        placeholder="Ask a question about the document..."
+                        rows="3"
+                        aria-label="Chat input"
+                    ></textarea>
+                    <button id="send-btn" class="btn btn-primary" aria-label="Send message">Send</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="stats">
+                <span id="stats-nodes">Nodes: 0</span>
+                <span id="stats-edges">Edges: 0</span>
+                <span id="stats-chunks">Chunks: 0</span>
+            </div>
+            <p class="footer-text">GraphLLM v1.0 | Powered by Gemini & Mistral</p>
+        </div>
+    </footer>
+
+    <!-- Processing Overlay -->
+    <div id="processing-overlay" class="processing-overlay" hidden>
+        <div class="processing-modal">
+            <div class="spinner"></div>
+            <h2 id="processing-title">Processing PDF</h2>
+            <p id="processing-message">Starting...</p>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <p id="processing-percent" class="processing-percent">0%</p>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
