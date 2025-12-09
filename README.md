@@ -73,7 +73,7 @@ The frontend is a single-page application located in `/frontend/`:
 - `app.js` - Graph visualization & API calls
 - `styles.css` - Styling
 
-Access it at: `http://your-space-url.hf.space/frontend/`
+
 
 
 ## 📦 Docker
